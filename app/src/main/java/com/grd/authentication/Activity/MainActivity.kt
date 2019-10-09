@@ -1,12 +1,15 @@
-package com.grd.authentication
+package com.grd.authentication.Activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.grd.authentication.R
 
-class LoginActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_main)
     }
+
+
 }
