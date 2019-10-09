@@ -1,6 +1,7 @@
 package com.grd.authentication.Activity
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -8,6 +9,7 @@ import com.grd.authentication.Model.LoginModel
 import com.grd.authentication.R
 import com.grd.authentication.Retrofit.Api
 import com.grd.authentication.Retrofit.ApiClient
+import com.grd.authentication.SharedPrefManager
 import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,12 +20,21 @@ class LoginActivity : AppCompatActivity() {
     lateinit var username: String
     lateinit var password: String
     lateinit var mApiInterface: Api
+    lateinit var sharedPrefManager:SharedPrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        sharedPrefManager = SharedPrefManager(this)
         mApiInterface = ApiClient.client!!.create(Api::class.java)
         btnLogin.setOnClickListener({ requestlogin() })
+
+        if (sharedPrefManager.spLoginStatus!!) {
+            val i = Intent(this@LoginActivity, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(i)
+            finish()
+        }
     }
 
     fun requestlogin() {
@@ -38,8 +49,9 @@ class LoginActivity : AppCompatActivity() {
                 if (value == "1") {
                     Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
                     val i = Intent(this@LoginActivity, MainActivity::class.java)
-//                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(i)
+                    sharedPrefManager.saveSP(SharedPrefManager.sp_logged_in, true)
                     finish()
                 } else {
                     Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
