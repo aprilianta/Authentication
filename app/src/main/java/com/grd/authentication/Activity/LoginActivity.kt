@@ -15,8 +15,8 @@ import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
-    var username: String = ""
-    var password: String = ""
+    lateinit var username: String
+    lateinit var password: String
     lateinit var mApiInterface: Api
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,10 +1,7 @@
 package com.grd.authentication.Model
 
-class LoginModel {
-    var value: String? = null
-        internal set
-    var message: String? = null
-        internal set
+data class LoginModel (
+    var value: String? = null,
+    var message: String? = null,
     var result: List<ResultUserModel>? = null
-        internal set
-}
+)
