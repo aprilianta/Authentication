@@ -35,7 +35,7 @@ class SharedPrefManager(context: Context) {
     }
 
     companion object {
-        val sp_app = "spAApp"
+        val sp_app = "spapp"
         val sp_username = "spusername"
         val sp_logged_in = "spLoggedIn"
     }

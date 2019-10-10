@@ -49,16 +49,33 @@
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|end"
-            android:layout_marginTop="16dp"
-            android:background="@color/colorPrimaryDark"
-            android:text="@string/login"
-            android:textColor="#fff"
-            app:cornerRadius="8dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="16dp"
+                android:background="@color/colorPrimaryDark"
+                android:text="@string/login"
+                android:textColor="#fff"
+                app:cornerRadius="8dp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@id/btnLogin"
+                android:indeterminateTint="@color/colorPrimary"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+
     </LinearLayout>
+
 </RelativeLayout>
