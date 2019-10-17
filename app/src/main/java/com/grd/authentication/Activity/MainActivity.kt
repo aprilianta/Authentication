@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 import com.grd.authentication.R
 import com.grd.authentication.SharedPrefManager
 import java.io.ByteArrayOutputStream
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
                         Intent(this@MainActivity, LoginActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
+                    FirebaseAuth.getInstance().signOut();
                     finish()
                 }
 

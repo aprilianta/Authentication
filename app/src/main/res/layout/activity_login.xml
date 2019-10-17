@@ -55,27 +55,61 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogin"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="16dp"
                 android:background="@color/colorPrimaryDark"
                 android:text="@string/login"
-                android:textColor="#fff"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
                 app:cornerRadius="8dp" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_toStartOf="@id/btnLogin"
+                android:layout_below="@id/btnLogin"
+                android:layout_centerInParent="true"
                 android:indeterminateTint="@color/colorPrimary"
                 android:visibility="invisible" />
+
         </RelativeLayout>
 
-
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="2">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/login_option"
+                android:textAlignment="center"
+                android:textColor="@color/colorGrey"
+                android:textSize="16sp"></com.google.android.material.textview.MaterialTextView>
+
+            <com.shobhitpuri.custombuttons.GoogleSignInButton
+                android:id="@+id/google_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
