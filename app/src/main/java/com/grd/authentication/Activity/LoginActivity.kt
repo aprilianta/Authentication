@@ -1,16 +1,24 @@
 package com.grd.authentication.Activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import com.facebook.*
+import com.facebook.appevents.AppEventsLogger
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -18,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.grd.authentication.Model.LoginModel
@@ -29,6 +38,10 @@ import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.util.*
+import com.facebook.FacebookSdk;
 
 class LoginActivity : AppCompatActivity() {
 
@@ -39,17 +52,57 @@ class LoginActivity : AppCompatActivity() {
     val RC_SIGN_IN: Int = 1
     lateinit var mGoogleSignInClient: GoogleSignInClient
     lateinit var mGoogleSignInOptions: GoogleSignInOptions
+    private var callbackManager: CallbackManager? = null
     private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        firebaseAuth = FirebaseAuth.getInstance()
         sharedPrefManager = SharedPrefManager(this)
         mApiInterface = ApiClient.client!!.create(Api::class.java)
         btnLogin.setOnClickListener({ requestlogin() })
-        google_button.setOnClickListener({ signIn() })
+        firebaseAuth = FirebaseAuth.getInstance()
         configureGoogleSignIn()
+        google_button.setOnClickListener({ googlesignin() })
+        createKeyHash(this, "com.grd.authentication")
+        fb_button.setOnClickListener({ fbsignin() })
+    }
+
+    private fun createKeyHash(activity: Activity, yourPackage: String) {
+        val info = activity.packageManager.getPackageInfo(yourPackage, PackageManager.GET_SIGNATURES)
+        for (signature in info.signatures) {
+            val md = MessageDigest.getInstance("SHA")
+            md.update(signature.toByteArray())
+            Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+        }
+    }
+
+    private fun fbsignin() {
+        callbackManager = CallbackManager.Factory.create()
+        LoginManager.getInstance()
+            .logInWithReadPermissions(this, Arrays.asList("public_profile", "email"))
+        LoginManager.getInstance().registerCallback(callbackManager,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
+                    Log.d("coeg", "Facebook token: " + loginResult.accessToken.token)
+                    val i = Intent(this@LoginActivity, MainActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    Toast.makeText(this@LoginActivity, "Success", Toast.LENGTH_SHORT).show()
+                    startActivity(i)
+                    progressBar.visibility = View.INVISIBLE
+                    finish()
+                }
+
+                override fun onCancel() {
+                    Toast.makeText(this@LoginActivity, "Facebook sign in failed", Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.INVISIBLE
+                }
+
+                override fun onError(error: FacebookException) {
+                    Toast.makeText(this@LoginActivity, "Facebook sign in error", Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.INVISIBLE
+                }
+            })
     }
 
     private fun configureGoogleSignIn() {
@@ -60,7 +113,8 @@ class LoginActivity : AppCompatActivity() {
         mGoogleSignInClient = GoogleSignIn.getClient(this, mGoogleSignInOptions)
     }
 
-    private fun signIn() {
+    private fun googlesignin() {
+        progressBar.visibility = View.VISIBLE
         val signInIntent: Intent = mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
@@ -72,13 +126,14 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 if (account != null) {
-                    progressBar.visibility = View.VISIBLE
+//                    progressBar.visibility = View.VISIBLE
                     firebaseAuthWithGoogle(account)
                 }
             } catch (e: ApiException) {
                 Toast.makeText(this, "Google sign in failed", Toast.LENGTH_LONG).show()
             }
         }
+        callbackManager?.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
@@ -93,13 +148,14 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             } else {
                 Toast.makeText(this, "Google sign in failed", Toast.LENGTH_LONG).show()
+                progressBar.visibility = View.INVISIBLE
             }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        val user = FirebaseAuth.getInstance().currentUser
+        val user = firebaseAuth.currentUser
         if (user != null || sharedPrefManager.spLoginStatus!!) {
             val i = Intent(this@LoginActivity, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
